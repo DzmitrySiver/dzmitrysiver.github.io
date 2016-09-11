@@ -78,12 +78,14 @@
             target = e.target,
             targetRow,
             targetCol;
+
         if (opts.dragActive) {
+            e.preventDefault();
+            e.stopPropagation();
 
             // get element from coordinates (for touchmove event only)
             if (e.touches) {
                 target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
-                console.log(target);
             }
 
             if (Array.prototype.indexOf.call(target.classList, 'tile') !== -1) {
@@ -106,7 +108,6 @@
         var self = dungeonRaidGame,
             opts = self.options;
 
-        console.log('touched');
         opts.dragActive = false;
 
         if (opts.activeTiles.length > 2) {
