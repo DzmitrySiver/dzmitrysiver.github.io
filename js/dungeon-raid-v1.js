@@ -33,66 +33,87 @@
 
     this.events = function () {
 
-        var self = this,
+        var objs = this.objects;
+
+        objs.gameField.addEventListener('mousedown', this.mouseDownFunction);
+        objs.gameField.addEventListener('touchstart', this.mouseDownFunction);
+
+        document.addEventListener('touchend', this.mouseUpFunction);
+        document.addEventListener('mouseup', this.mouseUpFunction);
+
+        objs.gameField.addEventListener('mouseover', this.mouseOverFunction);
+        objs.gameField.addEventListener('touchmove', this.mouseOverFunction);
+    };
+
+    this.mouseDownFunction = function(e) {
+
+        var self = dungeonRaidGame,
             opts = self.options,
-            objs = self.objects;
+            target = e.target,
+            targetRow,
+            targetCol,
+            virtualTile;
 
-        objs.gameField.addEventListener('mousedown', function (e) {
-            var target = e.target,
-                targetRow,
-                targetCol,
-                virtualTile;
+        if (e.button === 2) {
+            e.stopPropagation();
+            e.preventDefault();
+            return;
+        }
 
-            if (e.button === 2) {
-                e.stopPropagation();
-                e.preventDefault();
-                return;
+        if (Array.prototype.indexOf.call(target.classList, 'tile') !== -1) {
+            targetRow = target.getAttribute('row');
+            targetCol = target.getAttribute('col');
+            virtualTile = self.virtualGameField[targetRow][targetCol];
+
+            opts.activeType = virtualTile.type;
+            self.addActiveTile(targetRow, targetCol);
+            target.classList.add('active');
+        }
+    };
+
+    this.mouseOverFunction = function (e) {
+
+        var self = dungeonRaidGame,
+            opts = self.options,
+            target = e.target,
+            targetRow,
+            targetCol;
+        if (opts.dragActive) {
+
+            // get element from coordinates (for touchmove event only)
+            if (e.touches) {
+                target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+                console.log(target);
             }
 
             if (Array.prototype.indexOf.call(target.classList, 'tile') !== -1) {
                 targetRow = target.getAttribute('row');
                 targetCol = target.getAttribute('col');
-                virtualTile = self.virtualGameField[targetRow][targetCol];
 
-                opts.activeType = virtualTile.type;
-                self.addActiveTile(targetRow, targetCol);
-                target.classList.add('active');
-            }
-        }, false);
-
-        document.addEventListener('mouseup', function (e) {
-            opts.dragActive = false;
-
-            if (opts.activeTiles.length > 2) {
-                self.deleteActiveTiles();
-            }
-
-            self.resetActiveTiles();
-        }, false);
-
-        objs.gameField.addEventListener('mouseover', function (e) {
-            var target = e.target,
-                targetRow,
-                targetCol;
-
-            if (opts.dragActive) {
-                if (Array.prototype.indexOf.call(target.classList, 'tile') !== -1) {
-
-                    if (Array.prototype.indexOf.call(target.classList, 'active') === -1) {
-
-                        targetRow = target.getAttribute('row');
-                        targetCol = target.getAttribute('col');
-
-                        if (self.isNeigbour(targetRow, targetCol) && self.isCompatible(targetRow, targetCol)) {
-                            self.addActiveTile(targetRow, targetCol);
-                            target.classList.add('active');
-                        }
-                    } else {
-                        // TODO: remember user selection path for undo
+                if (self.virtualGameField[targetRow][targetCol].active === false) {
+                    if (self.isNeigbour(targetRow, targetCol) && self.isCompatible(targetRow, targetCol)) {
+                        self.addActiveTile(targetRow, targetCol);
+                        target.classList.add('active');
                     }
+                } else {
+                    // TODO: remember user selection path for undo
                 }
             }
-        }, false);
+        }
+    };
+
+    this.mouseUpFunction = function(e) {
+        var self = dungeonRaidGame,
+            opts = self.options;
+
+        console.log('touched');
+        opts.dragActive = false;
+
+        if (opts.activeTiles.length > 2) {
+            self.deleteActiveTiles();
+        }
+
+        self.resetActiveTiles();
     };
 
     this.isCompatible = function (row, col) {
@@ -123,7 +144,6 @@
         virtualTile.active = true;
         opts.lastActiveTile.row = row;
         opts.lastActiveTile.col = col;
-        // opts.activeType = virtualTile.type;
         opts.activeTiles.push({
             col: col,
             row: row
