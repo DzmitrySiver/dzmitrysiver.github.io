@@ -79,16 +79,22 @@ body {
 	border-right-color: #6aab4e;
 }
 
-.sword {
+.weapon {
 	background-image: url('../img/Sword-96.png');
 }
 
-.shield {
-	background-image: url('../img/Shield-96.png');
+.armor {
+	background-image: url('../img/Bulletproof Vest-96.png');
 }
 
-.skull {
+.enemy {
 	background-image: url('../img/Poison-96.png');
+}
+.money {
+	background-image: url('../img/Cheap 2-96.png');
+}
+.health {
+	background-image: url('../img/Test Tube-96.png');
 }
 
 .lazy-loaded {

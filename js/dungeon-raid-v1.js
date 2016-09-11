@@ -2,290 +2,320 @@
  * Created by Dzmitry_Siver on 9/5/2016.
  */
 
-function DungeonRaidGame(options) {
+;function DungeonRaidGame(options) {
 
-	this.options = {
-		colsNumber: options.colsNumber || 4,
-		rowsNumber: options.rowsNumber || 4,
-		tileSize: options.tileSize || 100,
-		dragActive: false,
-		activeType: '',
-		activeTiles: [],
-		lastActiveTile: {
-			row: null,
-			col: null
-		},
-		activeColumns: {},
-		tilesClassList: [
-			'sword',
-			'shield',
-			'skull'
-		]
-	};
+    this.objects = {
+        gameField: document.getElementById('gameWrapper')
+    };
 
-	this.virtualGameField = [];
+    this.options = {
+        colsNumber: options.colsNumber || 4,
+        rowsNumber: options.rowsNumber || 4,
+        tileSize: options.tileSize || 100,
+        dragActive: false,
+        activeType: '',
+        activeTiles: [],
+        lastActiveTile: {
+            row: null,
+            col: null
+        },
+        columnsChanged: {},
+        tilesClassList: [
+            'weapon',
+            'armor',
+            'enemy',
+            'money',
+            'health'
+        ]
+    };
 
-	this.events = function () {
+    this.virtualGameField = [];
 
-		var self = this,
-			opts = self.options;
+    this.events = function () {
 
-		gameField.addEventListener('mousedown', function (e) {
-			var target = e.target,
-				targetRow,
-				targetCol;
+        var self = this,
+            opts = self.options,
+            objs = self.objects;
 
-			if (Array.prototype.indexOf.call(target.classList, 'tile') !== -1) {
-				targetRow = target.getAttribute('row');
-				targetCol = target.getAttribute('col');
+        objs.gameField.addEventListener('mousedown', function (e) {
+            var target = e.target,
+                targetRow,
+                targetCol,
+                virtualTile;
 
-				self.addActiveTile(targetRow, targetCol);
-				target.classList.add('active');
-			}
-		}, false);
+            if (e.button === 2) {
+                e.stopPropagation();
+                e.preventDefault();
+                return;
+            }
 
-		gameField.addEventListener('mouseup', function (e) {
-			opts.dragActive = false;
+            if (Array.prototype.indexOf.call(target.classList, 'tile') !== -1) {
+                targetRow = target.getAttribute('row');
+                targetCol = target.getAttribute('col');
+                virtualTile = self.virtualGameField[targetRow][targetCol];
 
-			if (opts.activeTiles.length > 2) {
-				self.deleteActiveTiles();
-			}
+                opts.activeType = virtualTile.type;
+                self.addActiveTile(targetRow, targetCol);
+                target.classList.add('active');
+            }
+        }, false);
 
-			self.resetActiveTiles();
-		}, false);
+        document.addEventListener('mouseup', function (e) {
+            opts.dragActive = false;
 
-		gameField.addEventListener('mouseover', function (e) {
-			var target = e.target,
-				targetRow,
-				targetCol;
+            if (opts.activeTiles.length > 2) {
+                self.deleteActiveTiles();
+            }
 
-			if (opts.dragActive) {
-				if (Array.prototype.indexOf.call(target.classList, 'tile') !== -1) {
+            self.resetActiveTiles();
+        }, false);
 
-					if (Array.prototype.indexOf.call(target.classList, 'active') === -1) {
+        objs.gameField.addEventListener('mouseover', function (e) {
+            var target = e.target,
+                targetRow,
+                targetCol;
 
-						targetRow = target.getAttribute('row');
-						targetCol = target.getAttribute('col');
+            if (opts.dragActive) {
+                if (Array.prototype.indexOf.call(target.classList, 'tile') !== -1) {
 
-						if (self.isNeigbour(targetRow, targetCol) && self.isCompatible(targetRow, targetCol)) {
-							self.addActiveTile(targetRow, targetCol);
-							target.classList.add('active');
-						}
-					}
-				}
-			}
-		}, false);
-	};
+                    if (Array.prototype.indexOf.call(target.classList, 'active') === -1) {
 
-	this.isCompatible = function (row, col) {
-		var opts = this.options,
-			targetType;
+                        targetRow = target.getAttribute('row');
+                        targetCol = target.getAttribute('col');
 
-		targetType = this.virtualGameField[row][col].type;
+                        if (self.isNeigbour(targetRow, targetCol) && self.isCompatible(targetRow, targetCol)) {
+                            self.addActiveTile(targetRow, targetCol);
+                            target.classList.add('active');
+                        }
+                    } else {
+                        // TODO: remember user selection path for undo
+                    }
+                }
+            }
+        }, false);
+    };
 
-		return (opts.activeType === targetType);
-	};
+    this.isCompatible = function (row, col) {
+        var opts = this.options,
+            targetType;
 
-	this.isNeigbour = function (row, col) {
-		var opts = this.options;
+        targetType = this.virtualGameField[row][col].type;
 
-		return ((Math.abs(row - opts.lastActiveTile.row) < 2)
-		&&
-		((Math.abs(col - opts.lastActiveTile.col) < 2)));
-	};
+        if ((opts.activeType === 'weapon' || opts.activeType === 'enemy') && (targetType === 'weapon' || targetType === 'enemy')) {
+            return true;
+        }
+        return (opts.activeType === targetType);
+    };
 
-	this.addActiveTile = function (row, col) {
-		var opts = this.options,
-			virtualTile;
+    this.isNeigbour = function (row, col) {
+        var opts = this.options;
 
-		virtualTile = this.virtualGameField[row][col];
-		virtualTile.active = true;
-		opts.lastActiveTile.row = row;
-		opts.lastActiveTile.col = col;
-		opts.activeType = virtualTile.type;
-		opts.activeTiles.push({
-			col: col,
-			row: row
-		});
-		opts.activeColumns[col]++;
-		opts.dragActive = true;
-	};
+        return ((Math.abs(row - opts.lastActiveTile.row) < 2)
+        &&
+        ((Math.abs(col - opts.lastActiveTile.col) < 2)));
+    };
 
-	this.deleteActiveTiles = function () {
-		var opts = this.options,
-			i,
-			iLen = opts.activeTiles.length,
-			row,
-			col;
+    this.addActiveTile = function (row, col) {
+        var opts = this.options,
+            virtualTile;
 
-		if (iLen > 2) {
+        virtualTile = this.virtualGameField[row][col];
+        virtualTile.active = true;
+        opts.lastActiveTile.row = row;
+        opts.lastActiveTile.col = col;
+        // opts.activeType = virtualTile.type;
+        opts.activeTiles.push({
+            col: col,
+            row: row
+        });
+        opts.columnsChanged[col] = true;
+        opts.dragActive = true;
+    };
 
-			for (i = 0; i < iLen; i++) {
-				row = opts.activeTiles[i].row;
-				col = opts.activeTiles[i].col;
-				document.getElementById('' + row + col).remove();
-				this.virtualGameField[row][col] = null;
-			}
+    this.deleteActiveTiles = function () {
+        var opts = this.options,
+            i,
+            iLen = opts.activeTiles.length,
+            row,
+            col;
 
-			this.shiftTiles();
-			opts.activeTiles = [];
-			opts.lastActiveTile = {};
-		}
-	};
+        if (iLen > 2) {
 
-	this.shiftTiles = function () {
-		var opts = this.options,
-			columnChanged,
-			shiftNumber = 0,
-			row,
-			newRow,
-			col,
-			virtualTile,
-			tile;
+            for (i = 0; i < iLen; i++) {
+                row = opts.activeTiles[i].row;
+                col = opts.activeTiles[i].col;
+                document.getElementById('' + row + col).remove();
+                this.virtualGameField[row][col] = null;
+            }
 
-		for (col = 0; col < opts.colsNumber; col++) {
+            this.shiftTiles();
+            opts.activeTiles = [];
+            opts.lastActiveTile = {};
+        }
+    };
 
-			columnChanged = opts.activeColumns[col];
+    this.shiftTiles = function () {
+        var opts = this.options,
+            columnChanged,
+            shiftNumber = 0,
+            row,
+            newRow,
+            col,
+            virtualTile,
+            tile;
 
-			// TODO: set columnChanged to Boolean;  
-			if (columnChanged > 0) {
-				for (row = opts.rowsNumber - 1; row >= 0; row--) {
-					virtualTile = this.virtualGameField[row][col];
+        for (col = 0; col < opts.colsNumber; col++) {
 
-					if (!virtualTile) {
-						shiftNumber++
-					} else {
-						if (shiftNumber > 0) {
-							newRow = row + shiftNumber;
-							this.virtualGameField[newRow][col] = this.virtualGameField[row][col];
-							this.virtualGameField[row][col] = null;
+            columnChanged = opts.columnsChanged[col];
 
-							tile = document.getElementById('' + row + col);
-							tile.id = '' + newRow + col;
-							tile.setAttribute('row', newRow);
+            if (columnChanged) {
+                // goes from bottom to top in each changed column.
+                // free spots increases shiftNumber
+                // tiles moved down for shiftNumber
+                for (row = opts.rowsNumber - 1; row >= 0; row--) {
+                    virtualTile = this.virtualGameField[row][col];
 
-							//TODO: Function to calculate coords;
-							tile.style.top = newRow * opts.tileSize + 10 + 'px';
-						}
-					}
+                    if (!virtualTile) {
+                        shiftNumber++
+                    } else {
+                        if (shiftNumber > 0) {
+                            newRow = row + shiftNumber;
+                            this.virtualGameField[newRow][col] = this.virtualGameField[row][col];
+                            this.virtualGameField[row][col] = null;
 
-				}
+                            tile = document.getElementById('' + row + col);
+                            tile.id = '' + newRow + col;
+                            tile.setAttribute('row', newRow);
 
-				for (row = 0; row < shiftNumber; row++) {
-					this.createTile(row, col, shiftNumber);
-				}
-				this.revealTiles();
+                            //TODO: Function to calculate coords;
+                            tile.style.top = newRow * opts.tileSize + 10 + 'px';
+                        }
+                    }
+                }
 
-				shiftNumber = 0;
-			}
-		}
-	};
-	
-	this.revealTiles = function () {
-		var hiddenTiles;
+                for (row = 0; row < shiftNumber; row++) {
+                    this.createTile(row, col, shiftNumber);
+                }
 
-		hiddenTiles = document.querySelectorAll('.hidden');
-		for (var i = 0; i < hiddenTiles.length; i++) {
-			hiddenTiles[i].classList.remove('hidden');
-		}
-	};
+                shiftNumber = 0;
+                opts.columnsChanged[col] = false;
+            }
+        }
+    };
 
-	this.createTile = function (row, col, shiftNumber) {
-		var opts = this.options,
-			tile,
-			tileType;
+    /**
+     * Creates new tile with (row, col) coords.
+     * @param row {Number} Row
+     * @param col {Number} Col
+     * @param shiftNumber {Number} Number of rows for tile to fall through
+     */
+    this.createTile = function (row, col, shiftNumber) {
+        var self = this,
+            objs = self.objects,
+            opts = self.options,
+            tile,
+            tileType;
 
-		tileType = opts.tilesClassList[Math.floor(Math.random() * opts.tilesClassList.length)];
+        tileType = opts.tilesClassList[Math.floor(Math.random() * opts.tilesClassList.length)];
 
-		this.virtualGameField[row][col] = {
-			type: tileType,
-			active: false
-		};
+        this.virtualGameField[row][col] = {
+            type: tileType,
+            active: false
+        };
 
-		tile = document.createElement('div');
-		tile.id = '' + row + col;
-		tile.className = 'hidden tile ' + tileType;
-		tile.setAttribute('type', tileType);
-		tile.setAttribute('row', row);
-		tile.setAttribute('col', col);
-		tile.style.width = opts.tileSize - 20 + 'px';
-		tile.style.height = opts.tileSize - 20 + 'px';
-		tile.style.lineHeight = opts.tileSize - 30 + 'px';
-		// tile.innerHTML = tileType;
+        tile = document.createElement('div');
+        tile.id = '' + row + col;
+        tile.className = 'hidden tile ' + tileType;
+        tile.setAttribute('type', tileType);
+        tile.setAttribute('row', row);
+        tile.setAttribute('col', col);
+        tile.style.width = opts.tileSize - 20 + 'px';
+        tile.style.height = opts.tileSize - 20 + 'px';
+        tile.style.lineHeight = opts.tileSize - 30 + 'px';
 
-		if (shiftNumber) {
-			var self = this;
+        if (shiftNumber) {
+            this.setTilePosition(tile, row - shiftNumber, col);
 
-			this.setTilePosition(tile, row - shiftNumber, col);
+            objs.gameField.appendChild(tile);
 
-			gameField.appendChild(tile);
+            setTimeout(function () {
+                self.setTilePosition(tile, row, col);
+            }, 200);
 
-			setTimeout(function () {
-				self.setTilePosition(tile, row, col);
-			},200);
+        } else {
+            this.setTilePosition(tile, row, col);
+            objs.gameField.appendChild(tile);
+        }
+    };
 
-		} else {
-			this.setTilePosition(tile, row, col);
-			gameField.appendChild(tile);
-		}
-	};
+    /**
+     * Remove tiles selection and active classes
+     */
+    this.resetActiveTiles = function () {
+        var opts = this.options,
+            objs = this.objects,
+            activeDOMTiles,
+            i,
+            iLen;
 
-	this.resetActiveTiles = function () {
-		var opts = this.options,
-			activeDOMTiles,
-			i,
-			iLen;
+        opts.activeTiles = [];
+        activeDOMTiles = objs.gameField.querySelectorAll('.active');
+        iLen = activeDOMTiles.length;
 
-		opts.activeTiles = [];
-		activeDOMTiles = gameField.querySelectorAll('.active');
-		iLen = activeDOMTiles.length;
+        for (i = 0; i < iLen; i++) {
+            activeDOMTiles[i].classList.remove('active')
+        }
+    };
 
-		for (i = 0; i < iLen; i++) {
-			activeDOMTiles[i].classList.remove('active')
-		}
-	};
+    /**
+     * Fill gameField with tiles
+     */
+    this.createTiles = function () {
+        var row,
+            col,
+            opts = this.options;
 
-	/**
-	 * Fill gameField with tiles
-	 */
-	this.createTiles = function () {
-		var row,
-			col,
-			opts = this.options;
+        for (row = 0; row < opts.rowsNumber; row++) {
+            this.virtualGameField[row] = new Array(opts.colsNumber);
+            for (col = 0; col < opts.colsNumber; col++) {
 
-		for (row = 0; row < opts.rowsNumber; row++) {
-			this.virtualGameField[row] = new Array(opts.colsNumber);
-			for (col = 0; col < opts.colsNumber; col++) {
+                if (opts.columnsChanged[col] === undefined) {
+                    opts.columnsChanged[col] = false;
+                }
 
-				if (!opts.activeColumns[col]) {
-					opts.activeColumns[col] = 0;
-				}
+                this.createTile(row, col, opts.rowsNumber);
+            }
+        }
+    };
 
-				this.createTile(row, col);
-			}
-		}
-		this.revealTiles();
-	};
+    /**
+     * Set the tile to its position according to row and col number.
+     * @param element
+     * @param row
+     * @param col
+     */
+    this.setTilePosition = function (element, row, col) {
+        var opts = this.options;
 
-	this.setTilePosition = function (element, row, col) {
-		var opts = this.options;
+        element.style.top = row * opts.tileSize + 10 + 'px';
+        element.style.left = col * opts.tileSize + 10 + 'px';
+    };
 
-		element.style.top = row * opts.tileSize + 10 + 'px';
-		element.style.left = col * opts.tileSize + 10 + 'px';
-	};
+    this.init = function () {
+        var self = this,
+            opts = self.options,
+            objs = self.objects;
 
-	this.init = function () {
-		var opts = this.options;
+        objs.gameField.style.width = opts.tileSize * opts.colsNumber + 'px';
+        objs.gameField.style.height = opts.tileSize * opts.rowsNumber + 'px';
 
-		gameField.style.width = opts.tileSize * opts.colsNumber + 'px';
-		gameField.style.height = opts.tileSize * opts.rowsNumber + 'px';
+        setTimeout(function () {
+            self.createTiles();
+            self.events();
+        }, 200);
 
-		this.createTiles();
-		this.events();
-	};
+    };
 
-	var gameField = document.getElementById('gameWrapper');
-
-	this.init();
+    this.init();
 
 }
