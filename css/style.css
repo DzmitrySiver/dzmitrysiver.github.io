@@ -10,6 +10,36 @@ body {
 	background-color: #585a5b;
 }
 
+div {
+	margin-bottom: 20px;
+}
+
+.red {
+	/*position: relative;*/
+	top: 100px;
+	left: 100px;
+	background-color: red;
+	width: 200px;
+	height: 200px;
+}
+
+.abs {
+	width: 100px;
+	height: 100px;
+	background: yellow;
+	position: absolute;
+	bottom: 50px;
+	right: 50px;
+	/*margin-top: -50px;*/
+	/*margin-left: -50px;*/
+}
+.green {
+	position: relative;
+	background-color: green;
+	width: 200px;
+	height: 200px;
+}
+
 .siteWrapper {
 	display: table-cell;
 	vertical-align: middle;
@@ -22,7 +52,9 @@ body {
 	position: relative;
 	overflow: hidden;
 
+	-webkit-touch-callout: none;
 	-webkit-user-select: none;
+	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
@@ -36,7 +68,9 @@ body {
 	text-shadow: 1px 1px 0 #fff;
 	color: #666;
 
+	-webkit-touch-callout: none;
 	-webkit-user-select: none;
+	-khtml-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;

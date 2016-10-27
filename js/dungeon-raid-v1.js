@@ -43,6 +43,22 @@
 
         objs.gameField.addEventListener('mouseover', this.mouseOverFunction);
         objs.gameField.addEventListener('touchmove', this.mouseOverFunction);
+
+        objs.gameField.addEventListener('mouseleave', this.mouseLeaveFunction);
+
+    };
+
+    this.mouseLeaveFunction = function (e) {
+        var self = dungeonRaidGame,
+            opts = self.options;
+
+        opts.dragActive = false;
+
+        if (opts.activeTiles.length > 2) {
+            self.deleteActiveTiles();
+        }
+
+        self.resetActiveTiles();
     };
 
     this.mouseDownFunction = function(e) {
@@ -60,7 +76,10 @@
             return;
         }
 
-        if (Array.prototype.indexOf.call(target.classList, 'tile') !== -1) {
+        if (target.classList.contains('tile')) {
+
+            opts.activeTiles = [];
+
             targetRow = target.getAttribute('row');
             targetCol = target.getAttribute('col');
             virtualTile = self.virtualGameField[targetRow][targetCol];
@@ -88,7 +107,7 @@
                 target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
             }
 
-            if (Array.prototype.indexOf.call(target.classList, 'tile') !== -1) {
+            if (target.classList.contains('tile')) {
                 targetRow = target.getAttribute('row');
                 targetCol = target.getAttribute('col');
 
@@ -277,7 +296,18 @@
             objs = this.objects,
             activeDOMTiles,
             i,
-            iLen;
+            iLen,
+            virtualTile,
+            row,
+            col;
+
+        iLen = opts.activeTiles.length;
+        for (i = 0; i < iLen; i++) {
+            row = opts.activeTiles[i].row;
+            col = opts.activeTiles[i].col;
+            virtualTile = this.virtualGameField[row][col];
+            virtualTile.active = false;
+        }
 
         opts.activeTiles = [];
         activeDOMTiles = objs.gameField.querySelectorAll('.active');
@@ -286,6 +316,10 @@
         for (i = 0; i < iLen; i++) {
             activeDOMTiles[i].classList.remove('active')
         }
+
+        delete opts.lastActiveTile.row;
+        delete opts.lastActiveTile.col;
+        opts.columnsChanged = {};
     };
 
     /**
