@@ -107,6 +107,9 @@
 				}
 
 				if (target.classList.contains('tile')) {
+					if (target.classList.contains('active')) {
+						return;
+					}
 					targetRow = target.getAttribute('row');
 					targetCol = target.getAttribute('col');
 
