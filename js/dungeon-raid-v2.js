@@ -412,7 +412,7 @@
 			var opts = this.options;
 
 			element.style.transform = 'translateY(' + (row * opts.tileSize + 10) + 'px)';
-			element.style.left = col * opts.tileSize + 10 + 'px';
+			element.style.left = col * opts.tileSize + opts.tileMargin/2 + 'px';
 		},
 
 		calculateTileSize: function () {
