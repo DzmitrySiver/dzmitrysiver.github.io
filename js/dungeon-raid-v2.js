@@ -12,6 +12,8 @@
 			colsNumber: options.colsNumber || 4,
 			rowsNumber: options.rowsNumber || 4,
 			tileSize: options.tileSize || 100,
+			tileMargin: 20,
+			isMobile: false,
 			dragActive: false,
 			activeType: '',
 			activeTiles: [],
@@ -106,7 +108,7 @@
 					target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
 				}
 
-				if (target.classList.contains('tile')) {
+				if (target && target.classList.contains('tile')) {
 					if (target.classList.contains('active')) {
 						return;
 					}
@@ -326,8 +328,8 @@
 			tile.setAttribute('type', tileType);
 			tile.setAttribute('row', row);
 			tile.setAttribute('col', col);
-			tile.style.width = opts.tileSize - 20 + 'px';
-			tile.style.height = opts.tileSize - 20 + 'px';
+			tile.style.width = opts.tileSize - opts.tileMargin + 'px';
+			tile.style.height = opts.tileSize - opts.tileMargin + 'px';
 			tile.style.lineHeight = opts.tileSize - 30 + 'px';
 
 			if (shiftNumber) {
@@ -413,6 +415,29 @@
 			element.style.left = col * opts.tileSize + 10 + 'px';
 		},
 
+		calculateTileSize: function () {
+			var opts = this.options,
+				defaultWidth,
+				defaultHeight,
+				windowWidth,
+				windowHeight;
+
+			defaultWidth = opts.tileSize * opts.colsNumber;
+			defaultHeight = opts.tileSize * opts.rowsNumber;
+			windowWidth = window.innerWidth;
+			windowHeight = window.innerHeight;
+
+			if ( windowWidth < defaultWidth || windowHeight < defaultHeight) {
+				opts.isMobile = true;
+				opts.tileMargin = 10;
+				if (Math.abs(defaultWidth - windowWidth) > Math.abs(defaultHeight - windowHeight)) {
+					opts.tileSize = windowWidth / opts.colsNumber;
+				} else {
+					opts.tileSize = windowHeight / opts.rowsNumber;
+				}
+			}
+		},
+
 		/**
 		 * Game initialization
 		 */
@@ -420,6 +445,8 @@
 			var self = this,
 				opts = self.options,
 				objs = self.objects;
+
+			this.calculateTileSize();
 
 			objs.gameField.style.width = opts.tileSize * opts.colsNumber + 'px';
 			objs.gameField.style.height = opts.tileSize * opts.rowsNumber + 'px';
