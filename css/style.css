@@ -102,7 +102,7 @@ div {
 	position: absolute;
 	cursor: pointer;
 
-	transition: all 0.4s ease-in-out;
+	transition: background 0.2s linear, transform .4s ease-in-out;
 }
 
 .tile.active {

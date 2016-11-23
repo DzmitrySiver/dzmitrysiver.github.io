@@ -285,7 +285,7 @@
 								tile.setAttribute('row', newRow);
 
 								//TODO: Function to calculate coords;
-								tile.style.top = newRow * opts.tileSize + 10 + 'px';
+								tile.style.transform = 'translateY(' + (newRow * opts.tileSize + 10) + 'px)';
 							}
 						}
 					}
@@ -409,7 +409,7 @@
 		setTilePosition: function (element, row, col) {
 			var opts = this.options;
 
-			element.style.top = row * opts.tileSize + 10 + 'px';
+			element.style.transform = 'translateY(' + (row * opts.tileSize + 10) + 'px)';
 			element.style.left = col * opts.tileSize + 10 + 'px';
 		},
 
