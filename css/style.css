@@ -14,6 +14,12 @@ div {
 	margin-bottom: 20px;
 }
 
+.scoreBlock {
+	font-family: 'Roboto Condensed', sans-serif;
+	font-size: 20px;
+	color: #ccc;
+}
+
 .red {
 	/*position: relative;*/
 	top: 100px;
@@ -68,15 +74,7 @@ div {
 	text-shadow: 1px 1px 0 #fff;
 	color: #666;
 
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	user-select: none;
-
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 
 	background-color: #ddd;
@@ -112,6 +110,231 @@ div {
 	border-left-color: #82d260;
 	border-right-color: #6aab4e;
 }
+
+/* LINE TOP */
+.lineTop:before {
+	position: absolute;
+	display: block;
+	content: '';
+	width: 10px;
+	height: 10px;
+	top: -15px;
+	left: 50%;
+	margin-left: -3px;
+	background-color: #82d260;
+	z-index: -1;
+	cursor: default;
+}
+
+.lineTop:after {
+	position: absolute;
+	display: block;
+	content: '';
+	top: -35px;
+	left: 50%;
+	margin-left: -8px;
+	border: 10px solid;
+	border-color: transparent transparent #82d260 transparent;
+	box-sizing: border-box;
+	cursor: default;
+}
+
+/* LINE TOP RIGHT */
+.lineTopRight:before {
+	position: absolute;
+	display: block;
+	content: '';
+	width: 10px;
+	height: 20px;
+	top: -20px;
+	right: -15px;
+	background-color: #82d260;
+	z-index: -1;
+	transform: rotate(45deg);
+	cursor: default;
+}
+
+.lineTopRight:after {
+	position: absolute;
+	display: block;
+	content: '';
+	top: -34px;
+	right: -34px;
+	border: 10px solid;
+	border-color: transparent transparent #82d260 transparent;
+	box-sizing: border-box;
+	transform: rotate(45deg);
+	cursor: default;
+}
+
+/* LINE RIGHT */
+.lineRight:before {
+	position: absolute;
+	display: block;
+	content: '';
+	width: 10px;
+	height: 10px;
+	right: -15px;
+	top: 50%;
+	margin-top: -3px;
+	background-color: #82d260;
+	z-index: -1;
+	cursor: default;
+}
+
+.lineRight:after {
+	position: absolute;
+	display: block;
+	content: '';
+	top: 50%;
+	right: -35px;
+	margin-top: -8px;
+	border: 10px solid;
+	border-color: transparent transparent transparent #82d260;
+	box-sizing: border-box;
+	cursor: default;
+}
+
+/* LINE BOTTOM RIGHT */
+.lineBottomRight:before {
+	position: absolute;
+	display: block;
+	content: '';
+	width: 10px;
+	height: 20px;
+	bottom: -20px;
+	right: -15px;
+	background-color: #82d260;
+	z-index: -1;
+	transform: rotate(-45deg);
+	cursor: default;
+}
+
+.lineBottomRight:after {
+	position: absolute;
+	display: block;
+	content: '';
+	bottom: -34px;
+	right: -34px;
+	border: 10px solid;
+	border-color: transparent transparent transparent #82d260;
+	box-sizing: border-box;
+	transform: rotate(45deg);
+	cursor: default;
+}
+
+/* LINE BOTTOM */
+.lineBottom:before {
+	position: absolute;
+	display: block;
+	content: '';
+	width: 10px;
+	height: 10px;
+	bottom: -15px;
+	left: 50%;
+	margin-left: -3px;
+	background-color: #82d260;
+	z-index: -1;
+	cursor: default;
+}
+
+.lineBottom:after {
+	position: absolute;
+	display: block;
+	content: '';
+	bottom: -35px;
+	left: 50%;
+	margin-left: -8px;
+	border: 10px solid;
+	border-color: #82d260 transparent transparent transparent;
+	box-sizing: border-box;
+	cursor: default;
+}
+
+/* LINE BOTTOM LEFT */
+.lineBottomLeft:before {
+	position: absolute;
+	display: block;
+	content: '';
+	width: 10px;
+	height: 20px;
+	bottom: -20px;
+	left: -15px;
+	background-color: #82d260;
+	z-index: -1;
+	transform: rotate(45deg);
+	cursor: default;
+}
+
+.lineBottomLeft:after {
+	position: absolute;
+	display: block;
+	content: '';
+	bottom: -34px;
+	left: -34px;
+	border: 10px solid;
+	border-color: #82d260 transparent transparent transparent;
+	box-sizing: border-box;
+	transform: rotate(45deg);
+	cursor: default;
+}
+
+/* LINE LEFT */
+.lineLeft:before {
+	position: absolute;
+	display: block;
+	content: '';
+	width: 10px;
+	height: 10px;
+	left: -15px;
+	top: 50%;
+	margin-top: -3px;
+	background-color: #82d260;
+	z-index: -1;
+	cursor: default;
+}
+
+.lineLeft:after {
+	position: absolute;
+	display: block;
+	content: '';
+	top: 50%;
+	left: -35px;
+	margin-top: -8px;
+	border: 10px solid;
+	border-color: transparent #82d260 transparent transparent ;
+	box-sizing: border-box;
+	cursor: default;
+}
+
+/* LINE TOP LEFT */
+.lineTopLeft:before {
+	position: absolute;
+	display: block;
+	content: '';
+	width: 10px;
+	height: 20px;
+	top: -20px;
+	left: -15px;
+	background-color: #82d260;
+	z-index: -1;
+	transform: rotate(-45deg);
+	cursor: default;
+}
+
+.lineTopLeft:after {
+	position: absolute;
+	display: block;
+	content: '';
+	top: -34px;
+	left: -34px;
+	border: 10px solid;
+	border-color: transparent #82d260 transparent transparent;
+	box-sizing: border-box;
+	transform: rotate(45deg);
+	cursor: default;
+}
+
 
 .weapon {
 	background-image: url('../img/Sword-96.png');

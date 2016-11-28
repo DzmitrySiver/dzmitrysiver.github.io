@@ -28,7 +28,8 @@
 				'enemy',
 				'money',
 				'health'
-			]
+			],
+			score: 0
 		},
 		virtualGameField: [],
 
@@ -133,7 +134,7 @@
 		mouseUpHandler: function (e) {
 			var opts = this.options;
 
-			if(opts.dragActive) {
+			if (opts.dragActive) {
 				opts.dragActive = false;
 
 				if (opts.activeTiles.length > 2) {
@@ -175,7 +176,7 @@
 
 			return (
 				(Math.abs(row - opts.lastActiveTile.row) < 2)
-					&&
+				&&
 				(Math.abs(col - opts.lastActiveTile.col) < 2)
 			);
 		},
@@ -213,9 +214,8 @@
 			var opts = this.options,
 				virtualTile;
 
-			// TODO: Is it necessary?
-			// virtualTile = this.virtualGameField[row][col];
-			// virtualTile.active = true;
+			this.addActiveArrow(row, col);
+
 			opts.lastActiveTile.row = row;
 			opts.lastActiveTile.col = col;
 			opts.activeTiles.push({
@@ -224,6 +224,43 @@
 			});
 			opts.columnsChanged[col] = true;
 			opts.dragActive = true;
+		},
+
+		/**
+		 * Add an arrow to show the way of tile selecting
+		 * @param row {Number}
+		 * @param col {Number}
+		 */
+		addActiveArrow: function (row, col) {
+			var opts = this.options,
+				lastActiveCol,
+				lastActiveRow,
+				directionX = '',
+				directionY = '',
+				lastActiveTile;
+
+			lastActiveCol = opts.lastActiveTile.col;
+			lastActiveRow = opts.lastActiveTile.row;
+
+			if (!lastActiveCol || !lastActiveRow) {
+				return;
+			}
+
+			lastActiveTile = document.getElementById('' + lastActiveRow + lastActiveCol);
+
+			if (row > lastActiveRow) {
+				directionY = 'Bottom';
+			} else if (row < lastActiveRow) {
+				directionY = 'Top';
+			}
+
+			if (col > lastActiveCol) {
+				directionX = 'Right';
+			} else if (col < lastActiveCol) {
+				directionX = 'Left';
+			}
+
+			lastActiveTile.classList.add('line' + directionY + directionX);
 		},
 
 		/**
@@ -244,10 +281,19 @@
 					this.virtualGameField[row][col] = null;
 				}
 
+				this.updateScore(iLen);
 				this.shiftTiles();
 				opts.activeTiles = [];
 				opts.lastActiveTile = {};
 			}
+		},
+
+		updateScore: function (newScore) {
+			var opts = this.options,
+				scoreBlock = document.getElementById('score');
+
+			opts.score += newScore;
+			scoreBlock.innerHTML = opts.score;
 		},
 
 		/**
@@ -373,7 +419,7 @@
 			iLen = activeDOMTiles.length;
 
 			for (i = 0; i < iLen; i++) {
-				activeDOMTiles[i].classList.remove('active')
+				activeDOMTiles[i].classList.remove('active', 'lineTop', 'lineTopRight', 'lineRight', 'lineBottomRight', 'lineBottom', 'lineBottomLeft', 'lineLeft', 'lineTopLeft');
 			}
 
 			delete opts.lastActiveTile.row;
@@ -412,9 +458,13 @@
 			var opts = this.options;
 
 			element.style.transform = 'translateY(' + (row * opts.tileSize + 10) + 'px)';
-			element.style.left = col * opts.tileSize + opts.tileMargin/2 + 'px';
+			element.style.left = col * opts.tileSize + opts.tileMargin / 2 + 'px';
 		},
 
+
+		/**
+		 * Calculate tile size to fit in small screen
+		 */
 		calculateTileSize: function () {
 			var opts = this.options,
 				defaultWidth,
@@ -427,7 +477,7 @@
 			windowWidth = window.innerWidth;
 			windowHeight = window.innerHeight;
 
-			if ( windowWidth < defaultWidth || windowHeight < defaultHeight) {
+			if (windowWidth < defaultWidth || windowHeight < defaultHeight) {
 				opts.isMobile = true;
 				opts.tileMargin = 10;
 				if (Math.abs(defaultWidth - windowWidth) > Math.abs(defaultHeight - windowHeight)) {
