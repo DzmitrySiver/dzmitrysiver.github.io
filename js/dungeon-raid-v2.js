@@ -21,6 +21,10 @@
 				row: null,
 				col: null
 			},
+			penultActiveTile: {
+				row: null,
+				col: null
+			},
 			columnsChanged: {},
 			tilesClassList: [
 				'weapon',
@@ -110,8 +114,17 @@
 				}
 
 				if (target && target.classList.contains('tile')) {
+
+					targetRow = target.getAttribute('row');
+					targetCol = target.getAttribute('col');
+
 					if (target.classList.contains('active')) {
-						return;
+						if(targetRow === opts.penultActiveTile.row && targetCol === opts.penultActiveTile.col) {
+							this.revertMove();
+							return;
+						} else {
+							return;
+						}
 					}
 					targetRow = target.getAttribute('row');
 					targetCol = target.getAttribute('col');
@@ -211,11 +224,14 @@
 		 * @param col {Number}
 		 */
 		addActiveTile: function (row, col) {
-			var opts = this.options,
-				virtualTile;
+			var opts = this.options;
 
 			this.addActiveArrow(row, col);
 
+			if (opts.lastActiveTile.row && opts.lastActiveTile.col) {
+				opts.penultActiveTile.row = opts.lastActiveTile.row;
+				opts.penultActiveTile.col = opts.lastActiveTile.col;
+			}
 			opts.lastActiveTile.row = row;
 			opts.lastActiveTile.col = col;
 			opts.activeTiles.push({
@@ -261,6 +277,43 @@
 			}
 
 			lastActiveTile.classList.add('line' + directionY + directionX);
+		},
+
+		revertMove: function () {
+			var opts = this.options,
+				activeTilesCount,
+				lastActiveRow,
+				lastActiveCol,
+				lastActiveEl,
+				penultActiveRow,
+				penultActiveCol,
+				penultActiveEl;
+
+			activeTilesCount = opts.activeTiles.length;
+			if (activeTilesCount >= 2) {
+				console.log('reverted');
+				lastActiveRow = opts.lastActiveTile.row;
+				lastActiveCol = opts.lastActiveTile.col;
+				lastActiveEl = document.getElementById('' + lastActiveRow + lastActiveCol);
+				lastActiveEl.classList.remove('active');
+
+				penultActiveRow = opts.penultActiveTile.row;
+				penultActiveCol = opts.penultActiveTile.col;
+				penultActiveEl = document.getElementById('' + penultActiveRow + penultActiveCol);
+				penultActiveEl.classList.remove('lineTop', 'lineTopRight', 'lineRight', 'lineBottomRight', 'lineBottom', 'lineBottomLeft', 'lineLeft', 'lineTopLeft');
+
+				opts.lastActiveTile.row = penultActiveRow;
+				opts.lastActiveTile.col = penultActiveCol;
+				if (activeTilesCount === 2) {
+					opts.penultActiveTile.row = null;
+					opts.penultActiveTile.col = null;
+				} else {
+					opts.penultActiveTile.row = opts.activeTiles[activeTilesCount - 3].row; // -1 for zero index, -1 for penult tile, -1 for previous tile
+					opts.penultActiveTile.col = opts.activeTiles[activeTilesCount - 3].col;
+				}
+				opts.activeTiles.pop();
+
+			}
 		},
 
 		/**

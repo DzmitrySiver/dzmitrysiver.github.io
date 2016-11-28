@@ -18,6 +18,7 @@ div {
 	font-family: 'Roboto Condensed', sans-serif;
 	font-size: 20px;
 	color: #ccc;
+	user-select: none;
 }
 
 .red {
