@@ -7,7 +7,11 @@
 	var game = {
 		objects: {
 			gameField: document.getElementById('gameWrapper'),
-			bottomBlock: document.getElementById('bottomBlock')
+			bottomBlock: document.getElementById('bottomBlock'),
+			gameOverOverlay: document.getElementById('gameOver'),
+			scoreBlock: document.getElementById('score'),
+			moneyBlock: document.getElementById('money'),
+			healthBlock: document.getElementById('health')
 		},
 		options: {
 			colsNumber: options.colsNumber || 4,
@@ -122,7 +126,7 @@
 					targetCol = target.getAttribute('col');
 
 					if (target.classList.contains('active')) {
-						if(targetRow === opts.penultActiveTile.row && targetCol === opts.penultActiveTile.col) {
+						if (targetRow === opts.penultActiveTile.row && targetCol === opts.penultActiveTile.col) {
 							this.revertMove();
 							return;
 						} else {
@@ -349,75 +353,6 @@
 		},
 
 		/**
-		 * Add user score
-		 * @param addedScore {Number}
-		 */
-		addScore: function (addedScore) {
-			var opts = this.options,
-				scoreBlock = document.getElementById('score');
-
-			addedScore *= addedScore;
-			opts.score += addedScore;
-			scoreBlock.innerHTML = opts.score;
-		},
-
-		/**
-		 * Add user money
-		 * @param addedMoney {Number}
-		 */
-		addMoney: function (addedMoney) {
-			var opts = this.options,
-				moneyBlock = document.getElementById('money');
-
-			opts.money += addedMoney;
-			moneyBlock.innerHTML = opts.money;
-		},
-
-		/**
-		 * Add user health
-		 * @param addedHealth {Number}
-		 */
-		addHealth: function (addedHealth) {
-			var opts = this.options;
-
-			opts.health += addedHealth * 5;
-			this.updateHealth();
-		},
-
-		updateHealth: function () {
-			var opts = this.options,
-				healthBlock = document.getElementById('health');
-
-			healthBlock.innerHTML = opts.health;
-
-			if (opts.health === 0) {
-				document.getElementById('gameOver').classList.add('visible');
-			}
-		},
-
-		enemyMove: function () {
-			var opts = this.options,
-				col,
-				row,
-				virtualTile,
-				totalAttack = 0;
-
-			for (col = 0; col < opts.colsNumber; col++) {
-				for (row = opts.rowsNumber - 1; row >= 0; row--) {
-					virtualTile = this.virtualGameField[row][col];
-
-					if (virtualTile.type === 'enemy') {
-						totalAttack += virtualTile.attack;
-					}
-				}
-			}
-
-			opts.health > totalAttack ? opts.health -= totalAttack : opts.health = 0;
-
-			this.updateHealth();
-		},
-
-		/**
 		 * Shift tiles down to fill the gaps
 		 */
 		shiftTiles: function () {
@@ -467,6 +402,120 @@
 					opts.columnsChanged[col] = false;
 				}
 			}
+		},
+
+		/**
+		 * Remove active class and clear selection
+		 */
+		resetActiveTiles: function () {
+			var opts = this.options,
+				objs = this.objects,
+				activeDOMTiles,
+				i,
+				iLen,
+				virtualTile,
+				row,
+				col;
+
+			iLen = opts.activeTiles.length;
+			for (i = 0; i < iLen; i++) {
+				row = opts.activeTiles[i].row;
+				col = opts.activeTiles[i].col;
+				virtualTile = this.virtualGameField[row][col];
+				virtualTile.active = false;
+			}
+
+			opts.activeTiles = [];
+			activeDOMTiles = objs.gameField.querySelectorAll('.active');
+			iLen = activeDOMTiles.length;
+
+			for (i = 0; i < iLen; i++) {
+				activeDOMTiles[i].classList.remove('active', 'lineTop', 'lineTopRight', 'lineRight', 'lineBottomRight', 'lineBottom', 'lineBottomLeft', 'lineLeft', 'lineTopLeft');
+			}
+
+			delete opts.lastActiveTile.row;
+			delete opts.lastActiveTile.col;
+			opts.columnsChanged = {};
+		},
+
+
+		// ==========================================
+		// ============= Miscellaneous ==============
+		// ==========================================
+
+		/**
+		 * Add user score
+		 * @param addedScore {Number}
+		 */
+		addScore: function (addedScore) {
+			var opts = this.options,
+				objs = this.objects;
+
+			if (objs.scoreBlock) {
+				addedScore *= addedScore;
+				opts.score += addedScore;
+				objs.scoreBlock.innerHTML = opts.score;
+			}
+		},
+
+		/**
+		 * Add user money
+		 * @param addedMoney {Number}
+		 */
+		addMoney: function (addedMoney) {
+			var opts = this.options,
+				objs = this.objects;
+
+			if (objs.moneyBlock) {
+				opts.money += addedMoney;
+				objs.moneyBlock.innerHTML = opts.money;
+			}
+		},
+
+		/**
+		 * Add user health
+		 * @param addedHealth {Number}
+		 */
+		addHealth: function (addedHealth) {
+			var opts = this.options;
+
+			opts.health += addedHealth * 5;
+			this.updateHealth();
+		},
+
+		updateHealth: function () {
+			var opts = this.options,
+				objs = this.objects;
+
+			if (objs.healthBlock) {
+				objs.healthBlock.innerHTML = opts.health;
+			}
+
+			if (opts.health === 0) {
+				objs.gameOverOverlay.classList.add('visible');
+			}
+		},
+
+		enemyMove: function () {
+			var opts = this.options,
+				col,
+				row,
+				virtualTile,
+				totalAttack = 0;
+
+			for (col = 0; col < opts.colsNumber; col++) {
+				for (row = opts.rowsNumber - 1; row >= 0; row--) {
+					virtualTile = this.virtualGameField[row][col];
+
+					if (virtualTile.type === 'enemy') {
+						totalAttack += virtualTile.attack;
+					}
+				}
+			}
+
+			opts.health > totalAttack ? opts.health -= totalAttack : opts.health = 0;
+
+			this.updateHealth();
 		},
 
 		/**
@@ -535,40 +584,6 @@
 		},
 
 		/**
-		 * Remove active class and clear selection
-		 */
-		resetActiveTiles: function () {
-			var opts = this.options,
-				objs = this.objects,
-				activeDOMTiles,
-				i,
-				iLen,
-				virtualTile,
-				row,
-				col;
-
-			iLen = opts.activeTiles.length;
-			for (i = 0; i < iLen; i++) {
-				row = opts.activeTiles[i].row;
-				col = opts.activeTiles[i].col;
-				virtualTile = this.virtualGameField[row][col];
-				virtualTile.active = false;
-			}
-
-			opts.activeTiles = [];
-			activeDOMTiles = objs.gameField.querySelectorAll('.active');
-			iLen = activeDOMTiles.length;
-
-			for (i = 0; i < iLen; i++) {
-				activeDOMTiles[i].classList.remove('active', 'lineTop', 'lineTopRight', 'lineRight', 'lineBottomRight', 'lineBottom', 'lineBottomLeft', 'lineLeft', 'lineTopLeft');
-			}
-
-			delete opts.lastActiveTile.row;
-			delete opts.lastActiveTile.col;
-			opts.columnsChanged = {};
-		},
-
-		/**
 		 * Fill gameField with tiles
 		 */
 		createTiles: function () {
@@ -583,7 +598,6 @@
 					if (opts.columnsChanged[col] === undefined) {
 						opts.columnsChanged[col] = false;
 					}
-
 					this.createTile(row, col, opts.rowsNumber);
 				}
 			}
@@ -601,7 +615,6 @@
 			element.style.transform = 'translateY(' + (row * opts.tileSize + 10) + 'px)';
 			element.style.left = col * opts.tileSize + opts.tileMargin / 2 + 'px';
 		},
-
 
 		/**
 		 * Calculate tile size to fit in small screen
