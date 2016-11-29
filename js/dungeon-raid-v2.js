@@ -6,7 +6,8 @@
 
 	var game = {
 		objects: {
-			gameField: document.getElementById('gameWrapper')
+			gameField: document.getElementById('gameWrapper'),
+			bottomBlock: document.getElementById('bottomBlock')
 		},
 		options: {
 			colsNumber: options.colsNumber || 4,
@@ -634,12 +635,17 @@
 		init: function () {
 			var self = this,
 				opts = self.options,
-				objs = self.objects;
+				objs = self.objects,
+				gameWidth,
+				gameHeight;
 
 			this.calculateTileSize();
 
-			objs.gameField.style.width = opts.tileSize * opts.colsNumber + 'px';
-			objs.gameField.style.height = opts.tileSize * opts.rowsNumber + 'px';
+			gameHeight = opts.tileSize * opts.rowsNumber + 'px';
+			gameWidth = opts.tileSize * opts.colsNumber + 'px';
+			objs.gameField.style.width = gameWidth;
+			objs.gameField.style.height = gameHeight;
+			objs.bottomBlock.style.width = gameWidth;
 
 			// TODO: WTF?
 			setTimeout(function () {

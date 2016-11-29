@@ -1,3 +1,8 @@
+* {
+	user-select: none;
+	-moz-user-select: none;
+}
+
 html, body {
 	height: 100%;
 	width: 100%;
@@ -17,7 +22,6 @@ body {
 	bottom: 0;
 	left: 0;
 	background: rgba(0,0,0,.5);
-	user-select: none;
 	cursor: default;
 	display: none;
 }
@@ -45,9 +49,8 @@ body {
 	width: 500px;
 	display: table;
 	margin: 0 auto;
-	height: 100px;
+	height: 50px;
 	font-family: 'Roboto Condensed', sans-serif;
-	user-select: none;
 	padding: 10px;
 }
 
@@ -103,8 +106,6 @@ body {
 	background-color: #a5a6a7;
 	position: relative;
 	overflow: hidden;
-
-	user-select: none;
 }
 
 .tile {
@@ -114,8 +115,6 @@ body {
 	font-size: 20px;
 	text-shadow: 1px 1px 0 #fff;
 	color: #666;
-
-	user-select: none;
 	box-sizing: border-box;
 
 	background-color: #ddd;
