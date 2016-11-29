@@ -33,6 +33,7 @@
 				'money',
 				'health'
 			],
+			health: 100,
 			score: 0,
 			money: 0
 		},
@@ -135,8 +136,6 @@
 							this.addActiveTile(targetRow, targetCol);
 							target.classList.add('active');
 						}
-					} else {
-						// TODO: remember user selection path for undo
 					}
 				}
 			}
@@ -145,7 +144,7 @@
 		/**
 		 * Mouse up event handler
 		 */
-		mouseUpHandler: function (e) {
+		mouseUpHandler: function () {
 			var opts = this.options;
 
 			if (opts.dragActive) {
@@ -162,7 +161,7 @@
 		/**
 		 * Mouse leave event handler
 		 */
-		mouseLeaveHandler: function (e) {
+		mouseLeaveHandler: function () {
 			var opts = this.options;
 
 			opts.dragActive = false;
@@ -292,7 +291,6 @@
 
 			activeTilesCount = opts.activeTiles.length;
 			if (activeTilesCount >= 2) {
-				console.log('reverted');
 				lastActiveRow = opts.lastActiveTile.row;
 				lastActiveCol = opts.lastActiveTile.col;
 				lastActiveEl = document.getElementById('' + lastActiveRow + lastActiveCol);
@@ -334,41 +332,88 @@
 					document.getElementById('' + row + col).remove();
 					this.virtualGameField[row][col] = null;
 				}
-
 				if (opts.activeType === 'money') {
-					this.updateMoney(iLen);
+					this.addMoney(iLen);
 				}
-
-				this.updateScore(iLen);
+				if (opts.activeType === 'health') {
+					this.addHealth(iLen);
+				}
+				this.addScore(iLen);
 				this.shiftTiles();
 				opts.activeTiles = [];
 				opts.lastActiveTile = {};
+
+				this.enemyMove();
 			}
 		},
 
 		/**
 		 * Add user score
-		 * @param newScore {Number}
+		 * @param addedScore {Number}
 		 */
-		updateScore: function (newScore) {
+		addScore: function (addedScore) {
 			var opts = this.options,
 				scoreBlock = document.getElementById('score');
 
-			newScore *= newScore;
-			opts.score += newScore;
+			addedScore *= addedScore;
+			opts.score += addedScore;
 			scoreBlock.innerHTML = opts.score;
 		},
 
 		/**
 		 * Add user money
-		 * @param newMoney
+		 * @param addedMoney {Number}
 		 */
-		updateMoney: function (newMoney) {
+		addMoney: function (addedMoney) {
 			var opts = this.options,
 				moneyBlock = document.getElementById('money');
 
-			opts.money += newMoney;
+			opts.money += addedMoney;
 			moneyBlock.innerHTML = opts.money;
+		},
+
+		/**
+		 * Add user health
+		 * @param addedHealth {Number}
+		 */
+		addHealth: function (addedHealth) {
+			var opts = this.options;
+
+			opts.health += addedHealth * 5;
+			this.updateHealth();
+		},
+
+		updateHealth: function () {
+			var opts = this.options,
+				healthBlock = document.getElementById('health');
+
+			healthBlock.innerHTML = opts.health;
+
+			if (opts.health === 0) {
+				document.getElementById('gameOver').classList.add('visible');
+			}
+		},
+
+		enemyMove: function () {
+			var opts = this.options,
+				col,
+				row,
+				virtualTile,
+				totalAttack = 0;
+
+			for (col = 0; col < opts.colsNumber; col++) {
+				for (row = opts.rowsNumber - 1; row >= 0; row--) {
+					virtualTile = this.virtualGameField[row][col];
+
+					if (virtualTile.type === 'enemy') {
+						totalAttack += virtualTile.attack;
+					}
+				}
+			}
+
+			opts.health > totalAttack ? opts.health -= totalAttack : opts.health = 0;
+
+			this.updateHealth();
 		},
 
 		/**
@@ -434,7 +479,10 @@
 				objs = self.objects,
 				opts = self.options,
 				tile,
-				tileType;
+				tileType,
+				tileLabel,
+				attackLabel,
+				attack;
 
 			tileType = opts.tilesClassList[Math.floor(Math.random() * opts.tilesClassList.length)];
 
@@ -452,6 +500,23 @@
 			tile.style.width = opts.tileSize - opts.tileMargin + 'px';
 			tile.style.height = opts.tileSize - opts.tileMargin + 'px';
 			tile.style.lineHeight = opts.tileSize - 30 + 'px';
+
+			if (tileType === 'enemy') {
+				tileLabel = document.createElement('div');
+				tileLabel.id = 'label' + row + col;
+				tileLabel.className = 'tileLabel';
+
+				attackLabel = document.createElement('div');
+				attackLabel.className = 'attackLabel';
+
+				tile.appendChild(tileLabel);
+				tileLabel.appendChild(attackLabel);
+
+				attack = Math.floor(Math.random() * 3) + 1;
+				attackLabel.innerHTML = attack;
+
+				this.virtualGameField[row][col].attack = attack;
+			}
 
 			if (shiftNumber) {
 				this.setTilePosition(tile, row - shiftNumber, col);
