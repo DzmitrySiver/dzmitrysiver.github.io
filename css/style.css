@@ -14,11 +14,27 @@ div {
 	margin-bottom: 20px;
 }
 
-.scoreBlock {
+.bottomBlock {
+	box-sizing: border-box;
+	width: 500px;
+	display: table;
+	margin: 0 auto;
+	height: 100px;
 	font-family: 'Roboto Condensed', sans-serif;
+	user-select: none;
+	padding: 10px;
+}
+
+.scoreBlock {
+	display: table-cell;
 	font-size: 20px;
 	color: #ccc;
-	user-select: none;
+}
+
+.moneyBlock {
+	display: table-cell;
+	font-size: 20px;
+	color: #ccc;
 }
 
 .red {

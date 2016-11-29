@@ -33,7 +33,8 @@
 				'money',
 				'health'
 			],
-			score: 0
+			score: 0,
+			money: 0
 		},
 		virtualGameField: [],
 
@@ -207,9 +208,9 @@
 			targetType = this.virtualGameField[row][col].type;
 
 			// TODO: uncomment to enable Enemy-Weapon compatibility
-			// if ((opts.activeType === 'weapon' || opts.activeType === 'enemy') && (targetType === 'weapon' || targetType === 'enemy')) {
-			// 	return true;
-			// }
+			if ((opts.activeType === 'weapon' || opts.activeType === 'enemy') && (targetType === 'weapon' || targetType === 'enemy')) {
+				return true;
+			}
 			return (opts.activeType === targetType);
 		},
 
@@ -334,6 +335,10 @@
 					this.virtualGameField[row][col] = null;
 				}
 
+				if (opts.activeType === 'money') {
+					this.updateMoney(iLen);
+				}
+
 				this.updateScore(iLen);
 				this.shiftTiles();
 				opts.activeTiles = [];
@@ -341,12 +346,29 @@
 			}
 		},
 
+		/**
+		 * Add user score
+		 * @param newScore {Number}
+		 */
 		updateScore: function (newScore) {
 			var opts = this.options,
 				scoreBlock = document.getElementById('score');
 
+			newScore *= newScore;
 			opts.score += newScore;
 			scoreBlock.innerHTML = opts.score;
+		},
+
+		/**
+		 * Add user money
+		 * @param newMoney
+		 */
+		updateMoney: function (newMoney) {
+			var opts = this.options,
+				moneyBlock = document.getElementById('money');
+
+			opts.money += newMoney;
+			moneyBlock.innerHTML = opts.money;
 		},
 
 		/**

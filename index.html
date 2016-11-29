@@ -11,18 +11,26 @@
 
     <body>
         <div class="siteWrapper">
-            <div class="scoreBlock">
-                <span class="scoreLabel">Score:</span>
-                <span id="score">0</span>
-            </div>
             <div id="gameWrapper" class="gameWrapper"></div>
+            <div class="bottomBlock">
+                <div class="scoreBlock">
+                    <span class="scoreLabel">Score:</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="moneyBlock">
+                    <span class="moneyLabel">Money:</span>
+                    <span id="money">0</span>
+                </div>
+            </div>
+
+
         </div>
     </body>
 
     <script src="js/dungeon-raid-v2.js"></script>
     <script>
         DungeonRaidGame({
-            rowsNumber: 7,
+            rowsNumber: 6,
             colsNumber: 5,
             tileSize: 100
         });
