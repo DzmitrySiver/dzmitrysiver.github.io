@@ -39,6 +39,7 @@
 				'health'
 			],
 			health: 100,
+			defence: 3,
 			score: 0,
 			money: 0
 		},
@@ -531,8 +532,10 @@
 				tile,
 				tileType,
 				tileLabel,
-				attackLabel,
-				attack;
+				enemyAttackLabel,
+				enemyHealthLabel,
+				enemyAttack,
+				enemyHealth;
 
 			tileType = opts.tilesClassList[Math.floor(Math.random() * opts.tilesClassList.length)];
 
@@ -556,16 +559,22 @@
 				tileLabel.id = 'label' + row + col;
 				tileLabel.className = 'tileLabel';
 
-				attackLabel = document.createElement('div');
-				attackLabel.className = 'attackLabel';
+				enemyAttackLabel = document.createElement('div');
+				enemyAttackLabel.className = 'enemyAttackLabel';
+
+				enemyHealthLabel = document.createElement('div');
+				enemyHealthLabel.className = 'enemyHealthLabel';
 
 				tile.appendChild(tileLabel);
-				tileLabel.appendChild(attackLabel);
+				tileLabel.appendChild(enemyAttackLabel);
+				tileLabel.appendChild(enemyHealthLabel);
 
-				attack = Math.floor(Math.random() * 3) + 1;
-				attackLabel.innerHTML = attack;
+				enemyAttack = Math.floor(Math.random() * 3) + 1;
+				enemyHealth = Math.floor(Math.random() * 20) + 1;
+				enemyAttackLabel.innerHTML = enemyAttack;
+				enemyHealthLabel.innerHTML = enemyHealth;
 
-				this.virtualGameField[row][col].attack = attack;
+				this.virtualGameField[row][col].attack = enemyAttack;
 			}
 
 			if (shiftNumber) {

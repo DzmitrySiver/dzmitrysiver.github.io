@@ -13,18 +13,34 @@
 <div class="siteWrapper">
     <div id="gameWrapper" class="gameWrapper"></div>
     <div id="bottomBlock" class="bottomBlock">
-        <div class="bottomBlockItem scoreBlock">
-            <span class="scoreLabel">Score:</span>
-            <span id="score">0</span>
-        </div>
+        <!--<div class="bottomBlockItem scoreBlock">-->
+            <!--<span class="scoreLabel">Score:</span>-->
+            <!--<span id="score">0</span>-->
+        <!--</div>-->
         <div class="bottomBlockItem moneyBlock">
             <span class="moneyLabel">Money:</span>
             <span id="money">0</span>
+        </div>
+        <div class="bottomBlockItem statsBlock">
+            <div class="baseDamageBlock">
+                <span class="baseDamageLabel">Base damage:</span>
+                <span id="baseDamage" class="baseDamageValue">1</span>
+            </div>
+            <div class="weaponDamageBlock">
+                <span class="weaponDamageLabel">Weapon damage:</span>
+                <span id="weaponDamage" class="weaponDamageValue">3</span>
+            </div>
+            <div class="defenceBlock">
+                <span class="defenceLabel">Defence:</span>
+                <span id="defence" class="defenceValue">3</span>
+            </div>
         </div>
         <div class="bottomBlockItem healthBlock">
             <span class="healthLabel">Health:</span>
             <span id="health">100</span>
         </div>
+
+
     </div>
 </div>
 <div id="gameOver" class="overlay">

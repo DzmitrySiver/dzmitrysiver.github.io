@@ -57,6 +57,7 @@ body {
 
 .bottomBlockItem {
     display: table-cell;
+    vertical-align: middle;
     font-size: 20px;
     color: #ccc;
 }
@@ -163,12 +164,21 @@ body {
     color: #fff;
 }
 
-.attackLabel {
+.enemyAttackLabel {
     position: absolute;
     line-height: normal;
     margin: 0;
     bottom: 0;
     right: 5px;
+    color: #585a5b;
+}
+
+.enemyHealthLabel {
+    position: absolute;
+    line-height: normal;
+    margin: 0;
+    bottom: 0;
+    left: 5px;
     color: #585a5b;
 }
 
