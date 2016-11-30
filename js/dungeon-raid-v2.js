@@ -369,7 +369,7 @@
 				opts.activeTiles = [];
 				opts.lastActiveTile = {};
 
-				this.enemyMove();
+				this.enemyTurn();
 			}
 		},
 
@@ -572,7 +572,7 @@
 
 		},
 
-		enemyMove: function () {
+		enemyTurn: function () {
 			var opts = this.options,
 				col,
 				row,
@@ -585,7 +585,11 @@
 					virtualTile = this.virtualGameField[row][col];
 
 					if (virtualTile.type === 'enemy') {
-						totalAttack += virtualTile.attack;
+						if (virtualTile.isActive) {
+							totalAttack += virtualTile.attack;
+						} else {
+							virtualTile.isActive = true;
+						}
 					}
 				}
 			}
@@ -672,6 +676,7 @@
 
 				this.virtualGameField[row][col].attack = enemyAttack;
 				this.virtualGameField[row][col].health = enemyHealth;
+				this.virtualGameField[row][col].isActive = false;
 			}
 
 			if (shiftNumber) {
