@@ -38,7 +38,10 @@
 				'money',
 				'health'
 			],
+			weaponCount: 0,
 			health: 100,
+			baseDamage: 3,
+			weaponDamage: 3,
 			defence: 3,
 			score: 0,
 			money: 0
@@ -65,7 +68,7 @@
 			document.addEventListener('mouseup', self.mouseUpHandler.bind(self));
 
 			// Mouse leave
-			objs.gameField.addEventListener('mouseleave', self.mouseLeaveHandler.bind(self));
+			// objs.gameField.addEventListener('mouseleave', self.mouseLeaveHandler.bind(self));
 		},
 
 
@@ -244,8 +247,13 @@
 				col: col,
 				row: row
 			});
+			if (this.virtualGameField[row][col].type === 'weapon') {
+				opts.weaponCount++;
+			}
 			opts.columnsChanged[col] = true;
 			opts.dragActive = true;
+
+			console.log(opts.weaponCount * opts.weaponDamage + opts.baseDamage);
 		},
 
 		/**
@@ -301,7 +309,9 @@
 				lastActiveCol = opts.lastActiveTile.col;
 				lastActiveEl = document.getElementById('' + lastActiveRow + lastActiveCol);
 				lastActiveEl.classList.remove('active');
-
+				if (this.virtualGameField[lastActiveRow][lastActiveCol].type === 'weapon') {
+					opts.weaponCount--;
+				}
 				penultActiveRow = opts.penultActiveTile.row;
 				penultActiveCol = opts.penultActiveTile.col;
 				penultActiveEl = document.getElementById('' + penultActiveRow + penultActiveCol);
@@ -335,8 +345,11 @@
 				for (i = 0; i < iLen; i++) {
 					row = opts.activeTiles[i].row;
 					col = opts.activeTiles[i].col;
-					document.getElementById('' + row + col).remove();
-					this.virtualGameField[row][col] = null;
+					if (this.virtualGameField[row][col].type === 'enemy') {
+						this.damageEnemy(row, col);
+					} else {
+						this.deleteTile(row, col);
+					}
 				}
 				if (opts.activeType === 'money') {
 					this.addMoney(iLen);
@@ -346,11 +359,40 @@
 				}
 				this.addScore(iLen);
 				this.shiftTiles();
+				opts.weaponCount = 0;
 				opts.activeTiles = [];
 				opts.lastActiveTile = {};
 
 				this.enemyMove();
 			}
+		},
+
+		damageEnemy: function (row, col) {
+			var opts = this.options,
+				damage;
+
+			damage = opts.baseDamage + opts.weaponCount * opts.weaponDamage;
+			this.virtualGameField[row][col].health -= damage;
+			if (this.virtualGameField[row][col].health < 1) {
+				this.deleteTile(row, col);
+
+				// TODO: Add experience;
+
+			} else {
+				this.updateEnemyHealth(row, col);
+			}
+		},
+
+		updateEnemyHealth: function (row, col) {
+			var enemyHealth;
+
+			enemyHealth = this.virtualGameField[row][col].health;
+			document.getElementById('health' + row + col).innerHTML = enemyHealth;
+		},
+
+		deleteTile: function (row, col) {
+			document.getElementById('' + row + col).remove();
+			this.virtualGameField[row][col] = null;
 		},
 
 		/**
@@ -364,7 +406,9 @@
 				newRow,
 				col,
 				virtualTile,
-				tile;
+				tile,
+				enemyHealthLabel,
+				enemyAttackLabel;
 
 			for (col = 0; col < opts.colsNumber; col++) {
 
@@ -386,7 +430,15 @@
 								this.virtualGameField[row][col] = null;
 
 								tile = document.getElementById('' + row + col);
+								enemyHealthLabel = document.getElementById('health' + row + col);
+								enemyAttackLabel = document.getElementById('attack' + row + col);
 								tile.id = '' + newRow + col;
+								if (enemyHealthLabel) {
+									enemyHealthLabel.id = 'health' + newRow + col;
+								}
+								if (enemyAttackLabel) {
+									enemyAttackLabel.id = 'attack' + newRow + col;
+								}
 								tile.setAttribute('row', newRow);
 
 								//TODO: Function to calculate coords;
@@ -426,6 +478,7 @@
 				virtualTile.active = false;
 			}
 
+			opts.weaponCount = 0;
 			opts.activeTiles = [];
 			activeDOMTiles = objs.gameField.querySelectorAll('.active');
 			iLen = activeDOMTiles.length;
@@ -561,20 +614,23 @@
 
 				enemyAttackLabel = document.createElement('div');
 				enemyAttackLabel.className = 'enemyAttackLabel';
+				enemyAttackLabel.id = 'attack' + row + col;
 
 				enemyHealthLabel = document.createElement('div');
 				enemyHealthLabel.className = 'enemyHealthLabel';
+				enemyHealthLabel.id = 'health' + row + col;
 
 				tile.appendChild(tileLabel);
 				tileLabel.appendChild(enemyAttackLabel);
 				tileLabel.appendChild(enemyHealthLabel);
 
 				enemyAttack = Math.floor(Math.random() * 3) + 1;
-				enemyHealth = Math.floor(Math.random() * 20) + 1;
+				enemyHealth = Math.floor(Math.random() * 15) + 1;
 				enemyAttackLabel.innerHTML = enemyAttack;
 				enemyHealthLabel.innerHTML = enemyHealth;
 
 				this.virtualGameField[row][col].attack = enemyAttack;
+				this.virtualGameField[row][col].health = enemyHealth;
 			}
 
 			if (shiftNumber) {
@@ -582,6 +638,7 @@
 
 				objs.gameField.appendChild(tile);
 
+				// WTF?
 				setTimeout(function () {
 					self.setTilePosition(tile, row, col);
 				}, 200);
