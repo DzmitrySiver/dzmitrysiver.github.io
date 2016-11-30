@@ -11,7 +11,8 @@
 			gameOverOverlay: document.getElementById('gameOver'),
 			scoreBlock: document.getElementById('score'),
 			moneyBlock: document.getElementById('money'),
-			healthBlock: document.getElementById('health')
+			healthBlock: document.getElementById('health'),
+			defenceBlock: document.getElementById('defence')
 		},
 		options: {
 			colsNumber: options.colsNumber || 4,
@@ -351,12 +352,17 @@
 						this.deleteTile(row, col);
 					}
 				}
+
 				if (opts.activeType === 'money') {
 					this.addMoney(iLen);
 				}
 				if (opts.activeType === 'health') {
 					this.addHealth(iLen);
 				}
+				if (opts.activeType === 'armor') {
+					this.addArmor(iLen);
+				}
+
 				this.addScore(iLen);
 				this.shiftTiles();
 				opts.weaponCount = 0;
@@ -537,6 +543,12 @@
 			this.updateHealth();
 		},
 
+		addArmor: function (addedArmor) {
+			var opts = this.options;
+
+			opts.defence += addedArmor;
+		},
+
 		updateHealth: function () {
 			var opts = this.options,
 				objs = this.objects;
@@ -550,11 +562,22 @@
 			}
 		},
 
+		updateDefence: function () {
+			var opts = this.options,
+				objs = this.objects;
+
+			if (objs.defenceBlock) {
+				objs.defenceBlock.innerHTML = opts.defence;
+			}
+
+		},
+
 		enemyMove: function () {
 			var opts = this.options,
 				col,
 				row,
 				virtualTile,
+				defenceDamage,
 				totalAttack = 0;
 
 			for (col = 0; col < opts.colsNumber; col++) {
@@ -567,8 +590,26 @@
 				}
 			}
 
-			opts.health > totalAttack ? opts.health -= totalAttack : opts.health = 0;
+			defenceDamage =  Math.floor(totalAttack / 3);
+			if (totalAttack > opts.defence) {
+				totalAttack -= opts.defence;
+			} else {
+				totalAttack = 0;
+			}
 
+			if (opts.defence > defenceDamage) {
+				opts.defence -= defenceDamage;
+			} else {
+				opts.defence = 0;
+			}
+
+			if (opts.health > totalAttack) {
+				opts.health -= totalAttack;
+			} else {
+				opts.health = 0;
+			}
+
+			this.updateDefence();
 			this.updateHealth();
 		},
 
