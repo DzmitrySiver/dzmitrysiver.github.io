@@ -12,7 +12,13 @@
 			scoreBlock: document.getElementById('score'),
 			moneyBlock: document.getElementById('money'),
 			healthBlock: document.getElementById('health'),
-			defenceBlock: document.getElementById('defence')
+			defenceBlock: document.getElementById('defence'),
+
+			healSound: null,
+			hitSound: null,
+			weaponSound: null,
+			armorSound: null,
+			coinsSound: null
 		},
 		options: {
 			colsNumber: options.colsNumber || 4,
@@ -375,7 +381,14 @@
 
 		damageEnemy: function (row, col) {
 			var opts = this.options,
+				objs = this.objects,
 				damage;
+
+			if (opts.weaponCount) {
+				objs.weaponSound.play();
+			} else {
+				objs.hitSound.play();
+			}
 
 			damage = opts.baseDamage + opts.weaponCount * opts.weaponDamage;
 			this.virtualGameField[row][col].health -= damage;
@@ -526,6 +539,7 @@
 			var opts = this.options,
 				objs = this.objects;
 
+			objs.coinsSound.play();
 			if (objs.moneyBlock) {
 				opts.money += addedMoney;
 				objs.moneyBlock.innerHTML = opts.money;
@@ -537,15 +551,19 @@
 		 * @param addedHealth {Number}
 		 */
 		addHealth: function (addedHealth) {
-			var opts = this.options;
+			var opts = this.options,
+				objs = this.objects;
 
+			objs.healSound.play();
 			opts.health += addedHealth * 5;
 			this.updateHealth();
 		},
 
 		addArmor: function (addedArmor) {
-			var opts = this.options;
+			var opts = this.options,
+				objs = this.objects;
 
+			objs.armorSound.play();
 			opts.defence += addedArmor;
 		},
 
@@ -754,6 +772,25 @@
 			}
 		},
 
+		initSounds: function () {
+			var objs = this.objects;
+
+			objs.healSound = document.createElement('audio');
+			objs.healSound.src = 'sounds/heal.mp3';
+
+			objs.hitSound = document.createElement('audio');
+			objs.hitSound.src = 'sounds/hit.mp3';
+
+			objs.weaponSound = document.createElement('audio');
+			objs.weaponSound.src = 'sounds/sword.mp3';
+
+			objs.armorSound = document.createElement('audio');
+			objs.armorSound.src = 'sounds/armor.mp3';
+
+			objs.coinsSound = document.createElement('audio');
+			objs.coinsSound.src = 'sounds/coins.mp3';
+		},
+
 		/**
 		 * Game initialization
 		 */
@@ -764,6 +801,7 @@
 				gameWidth,
 				gameHeight;
 
+			this.initSounds();
 			this.calculateTileSize();
 
 			gameHeight = opts.tileSize * opts.rowsNumber + 'px';

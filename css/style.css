@@ -195,6 +195,7 @@ body {
     background-color: #82d260;
     z-index: -1;
     cursor: default;
+    pointer-events: none;
 }
 
 .lineTop:after {
@@ -208,6 +209,7 @@ body {
     border-color: transparent transparent #82d260 transparent;
     box-sizing: border-box;
     cursor: default;
+    pointer-events: none;
 }
 
 /* LINE TOP RIGHT */
@@ -223,6 +225,7 @@ body {
     z-index: -1;
     transform: rotate(45deg);
     cursor: default;
+    pointer-events: none;
 }
 
 .lineTopRight:after {
@@ -236,6 +239,7 @@ body {
     box-sizing: border-box;
     transform: rotate(45deg);
     cursor: default;
+    pointer-events: none;
 }
 
 /* LINE RIGHT */
@@ -251,6 +255,7 @@ body {
     background-color: #82d260;
     z-index: -1;
     cursor: default;
+    pointer-events: none;
 }
 
 .lineRight:after {
@@ -264,6 +269,7 @@ body {
     border-color: transparent transparent transparent #82d260;
     box-sizing: border-box;
     cursor: default;
+    pointer-events: none;
 }
 
 /* LINE BOTTOM RIGHT */
@@ -279,6 +285,7 @@ body {
     z-index: -1;
     transform: rotate(-45deg);
     cursor: default;
+    pointer-events: none;
 }
 
 .lineBottomRight:after {
@@ -292,6 +299,7 @@ body {
     box-sizing: border-box;
     transform: rotate(45deg);
     cursor: default;
+    pointer-events: none;
 }
 
 /* LINE BOTTOM */
@@ -307,6 +315,7 @@ body {
     background-color: #82d260;
     z-index: -1;
     cursor: default;
+    pointer-events: none;
 }
 
 .lineBottom:after {
@@ -320,6 +329,7 @@ body {
     border-color: #82d260 transparent transparent transparent;
     box-sizing: border-box;
     cursor: default;
+    pointer-events: none;
 }
 
 /* LINE BOTTOM LEFT */
@@ -335,6 +345,7 @@ body {
     z-index: -1;
     transform: rotate(45deg);
     cursor: default;
+    pointer-events: none;
 }
 
 .lineBottomLeft:after {
@@ -348,6 +359,7 @@ body {
     box-sizing: border-box;
     transform: rotate(45deg);
     cursor: default;
+    pointer-events: none;
 }
 
 /* LINE LEFT */
@@ -363,6 +375,7 @@ body {
     background-color: #82d260;
     z-index: -1;
     cursor: default;
+    pointer-events: none;
 }
 
 .lineLeft:after {
@@ -376,6 +389,7 @@ body {
     border-color: transparent #82d260 transparent transparent;
     box-sizing: border-box;
     cursor: default;
+    pointer-events: none;
 }
 
 /* LINE TOP LEFT */
@@ -391,6 +405,7 @@ body {
     z-index: -1;
     transform: rotate(-45deg);
     cursor: default;
+    pointer-events: none;
 }
 
 .lineTopLeft:after {
@@ -404,6 +419,7 @@ body {
     box-sizing: border-box;
     transform: rotate(45deg);
     cursor: default;
+    pointer-events: none;
 }
 
 .weapon {
