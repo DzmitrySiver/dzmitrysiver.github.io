@@ -111,6 +111,23 @@ body {
     overflow: hidden;
 }
 
+.gameWrapperOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    transition: background .2s ease-in-out;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.gameWrapperOverlay.visible {
+    pointer-events: auto;
+    background: rgba(0, 0, 0, .2);
+}
+
 .tile {
     /*opacity: 0;*/
     font-family: 'Roboto Condensed', sans-serif;
@@ -152,6 +169,11 @@ body {
     border-bottom-color: #5d9048;
     border-left-color: #82d260;
     border-right-color: #6aab4e;
+}
+
+.tile.visible {
+    z-index: 1;
+    pointer-events: none;
 }
 
 .tileLabel {

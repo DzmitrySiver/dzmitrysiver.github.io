@@ -7,6 +7,7 @@
 	var game = {
 		objects: {
 			gameField: document.getElementById('gameWrapper'),
+			gameOverlay: document.getElementById('gameWrapperOverlay'),
 			bottomBlock: document.getElementById('bottomBlock'),
 			gameOverOverlay: document.getElementById('gameOver'),
 			scoreBlock: document.getElementById('score'),
@@ -21,6 +22,8 @@
 			coinsSound: null
 		},
 		options: {
+			overlayAnimationTime: 600,
+			enemyAttackAnimationTime: 300,
 			colsNumber: options.colsNumber || 4,
 			rowsNumber: options.rowsNumber || 4,
 			tileSize: options.tileSize || 100,
@@ -47,9 +50,11 @@
 			],
 			weaponCount: 0,
 			health: 100,
+			maxHealth: 100,
 			baseDamage: 3,
 			weaponDamage: 3,
 			defence: 3,
+			maxDefence: 20,
 			score: 0,
 			money: 0
 		},
@@ -165,29 +170,27 @@
 
 			if (opts.dragActive) {
 				opts.dragActive = false;
-
 				if (opts.activeTiles.length > 2) {
 					this.deleteActiveTiles();
 				}
-
 				this.resetActiveTiles();
 			}
 		},
 
-		/**
-		 * Mouse leave event handler
-		 */
-		mouseLeaveHandler: function () {
-			var opts = this.options;
-
-			opts.dragActive = false;
-
-			if (opts.activeTiles.length > 2) {
-				this.deleteActiveTiles();
-			}
-
-			this.resetActiveTiles();
-		},
+		// /**
+		//  * Mouse leave event handler
+		//  */
+		// mouseLeaveHandler: function () {
+		// 	var opts = this.options;
+		//
+		// 	opts.dragActive = false;
+		//
+		// 	if (opts.activeTiles.length > 2) {
+		// 		this.deleteActiveTiles();
+		// 	}
+		//
+		// 	this.resetActiveTiles();
+		// },
 
 
 		// ==========================================
@@ -343,12 +346,14 @@
 		 */
 		deleteActiveTiles: function () {
 			var opts = this.options,
+				objs = this.objects,
 				i,
 				iLen = opts.activeTiles.length,
 				row,
 				col;
 
 			if (iLen > 2) {
+				objs.gameOverlay.classList.add('visible');
 				for (i = 0; i < iLen; i++) {
 					row = opts.activeTiles[i].row;
 					col = opts.activeTiles[i].col;
@@ -524,9 +529,9 @@
 			var opts = this.options,
 				objs = this.objects;
 
+			addedScore *= addedScore;
+			opts.score += addedScore;
 			if (objs.scoreBlock) {
-				addedScore *= addedScore;
-				opts.score += addedScore;
 				objs.scoreBlock.innerHTML = opts.score;
 			}
 		},
@@ -556,6 +561,9 @@
 
 			objs.healSound.play();
 			opts.health += addedHealth * 5;
+			if (opts.health > opts.maxHealth) {
+				opts.health = opts.maxHealth;
+			}
 			this.updateHealth();
 		},
 
@@ -565,6 +573,10 @@
 
 			objs.armorSound.play();
 			opts.defence += addedArmor;
+			if (opts.defence > opts.maxDefence) {
+				opts.defence = opts.maxDefence;
+			}
+			this.updateDefence();
 		},
 
 		updateHealth: function () {
@@ -591,19 +603,28 @@
 		},
 
 		enemyTurn: function () {
-			var opts = this.options,
+			var self = this,
+				opts = self.options,
+				objs = self.objects,
 				col,
 				row,
 				virtualTile,
 				defenceDamage,
-				totalAttack = 0;
+				activeEnemy,
+				activeEnemies = [],
+				totalAttack = 0,
+				i,
+				iLen;
 
 			for (col = 0; col < opts.colsNumber; col++) {
 				for (row = opts.rowsNumber - 1; row >= 0; row--) {
-					virtualTile = this.virtualGameField[row][col];
+					virtualTile = self.virtualGameField[row][col];
 
 					if (virtualTile.type === 'enemy') {
 						if (virtualTile.isActive) {
+							activeEnemy = document.getElementById('' + row + col);
+							activeEnemy.classList.add('visible');
+							activeEnemies.push(activeEnemy);
 							totalAttack += virtualTile.attack;
 						} else {
 							virtualTile.isActive = true;
@@ -612,27 +633,48 @@
 				}
 			}
 
-			defenceDamage =  Math.floor(totalAttack / 3);
-			if (totalAttack > opts.defence) {
-				totalAttack -= opts.defence;
-			} else {
-				totalAttack = 0;
-			}
+			setTimeout(function () {
 
-			if (opts.defence > defenceDamage) {
-				opts.defence -= defenceDamage;
-			} else {
-				opts.defence = 0;
-			}
+				defenceDamage =  Math.floor(totalAttack / 3);
 
-			if (opts.health > totalAttack) {
-				opts.health -= totalAttack;
-			} else {
-				opts.health = 0;
-			}
+				if (totalAttack > opts.defence) {
+					totalAttack -= opts.defence;
+				} else {
+					totalAttack = 0;
+				}
 
-			this.updateDefence();
-			this.updateHealth();
+				if (opts.defence > defenceDamage) {
+					opts.defence -= defenceDamage;
+				} else {
+					opts.defence = 0;
+				}
+
+				if (opts.health > totalAttack) {
+					opts.health -= totalAttack;
+				} else {
+					opts.health = 0;
+				}
+
+				if (activeEnemies.length) {
+					objs.hitSound.play();
+				}
+
+				self.updateDefence();
+				self.updateHealth();
+
+				setTimeout(function () {
+					iLen = activeEnemies.length;
+					if (iLen) {
+						for (i = 0; i < iLen; i++) {
+							activeEnemies[i].classList.remove('visible');
+						}
+					}
+
+					objs.gameOverlay.classList.remove('visible');
+				}, opts.enemyAttackAnimationTime);
+
+			}, opts.overlayAnimationTime);
+
 		},
 
 		/**
