@@ -80,6 +80,12 @@
 			document.addEventListener('touchend', self.mouseUpHandler.bind(self));
 			document.addEventListener('mouseup', self.mouseUpHandler.bind(self));
 
+			window.addEventListener('contextmenu', function(e) {
+				event.preventDefault(e);
+				event.stopPropagation(e);
+				return false;
+			});
+
 			// Mouse leave
 			// objs.gameField.addEventListener('mouseleave', self.mouseLeaveHandler.bind(self));
 		},
