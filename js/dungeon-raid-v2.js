@@ -81,8 +81,8 @@
 			document.addEventListener('mouseup', self.mouseUpHandler.bind(self));
 
 			window.addEventListener('contextmenu', function(e) {
-				event.preventDefault(e);
-				event.stopPropagation(e);
+				e.preventDefault(e);
+				e.stopPropagation(e);
 				return false;
 			});
 
@@ -105,7 +105,7 @@
 				targetCol,
 				virtualTile;
 
-			if (e.button === 2) {
+			if (e.button === 2 || e.buttons === 2) {
 				e.stopPropagation();
 				e.preventDefault();
 				return;
