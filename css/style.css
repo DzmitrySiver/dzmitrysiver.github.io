@@ -171,6 +171,14 @@ body {
     border-right-color: #6aab4e;
 }
 
+.tile.killed {
+    background-color: #eb3919;
+    border-top-color: #ff623b;
+    border-bottom-color: #c51512;
+    border-left-color: #f05c38;
+    border-right-color: #dd3618;
+}
+
 .tile.visible {
     z-index: 1;
     pointer-events: none;

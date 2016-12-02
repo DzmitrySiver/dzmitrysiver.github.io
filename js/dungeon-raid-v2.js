@@ -56,7 +56,8 @@
 			defence: 3,
 			maxDefence: 20,
 			score: 0,
-			money: 0
+			money: 0,
+			damage: 0
 		},
 		virtualGameField: [],
 
@@ -243,7 +244,8 @@
 		 * @param col {Number}
 		 */
 		addActiveTile: function (row, col) {
-			var opts = this.options;
+			var opts = this.options,
+				tileType;
 
 			this.addActiveArrow(row, col);
 
@@ -251,14 +253,21 @@
 				opts.penultActiveTile.row = opts.lastActiveTile.row;
 				opts.penultActiveTile.col = opts.lastActiveTile.col;
 			}
+			tileType = this.virtualGameField[row][col].type;
 			opts.lastActiveTile.row = row;
 			opts.lastActiveTile.col = col;
 			opts.activeTiles.push({
 				col: col,
-				row: row
+				row: row,
+				type: tileType
 			});
-			if (this.virtualGameField[row][col].type === 'weapon') {
+
+			if (tileType === 'enemy') {
+				this.calculateDamage();
+			}
+			if (tileType === 'weapon') {
 				opts.weaponCount++;
+				this.calculateDamage();
 			}
 			opts.columnsChanged[col] = true;
 			opts.dragActive = true;
@@ -318,7 +327,7 @@
 				lastActiveRow = opts.lastActiveTile.row;
 				lastActiveCol = opts.lastActiveTile.col;
 				lastActiveEl = document.getElementById('' + lastActiveRow + lastActiveCol);
-				lastActiveEl.classList.remove('active');
+				lastActiveEl.classList.remove('active', 'killed');
 				if (this.virtualGameField[lastActiveRow][lastActiveCol].type === 'weapon') {
 					opts.weaponCount--;
 				}
@@ -337,7 +346,7 @@
 					opts.penultActiveTile.col = opts.activeTiles[activeTilesCount - 3].col;
 				}
 				opts.activeTiles.pop();
-
+				this.calculateDamage();
 			}
 		},
 
@@ -386,8 +395,7 @@
 
 		damageEnemy: function (row, col) {
 			var opts = this.options,
-				objs = this.objects,
-				damage;
+				objs = this.objects;
 
 			if (opts.weaponCount) {
 				objs.weaponSound.play();
@@ -395,8 +403,7 @@
 				objs.hitSound.play();
 			}
 
-			damage = opts.baseDamage + opts.weaponCount * opts.weaponDamage;
-			this.virtualGameField[row][col].health -= damage;
+			this.virtualGameField[row][col].health -= opts.damage;
 			if (this.virtualGameField[row][col].health < 1) {
 				this.deleteTile(row, col);
 
@@ -404,6 +411,37 @@
 
 			} else {
 				this.updateEnemyHealth(row, col);
+			}
+		},
+
+		calculateDamage: function () {
+			var opts = this.options,
+				virtualTile,
+				tile,
+				row,
+				col,
+				type,
+				i,
+				iLen;
+
+			opts.damage = opts.baseDamage + opts.weaponCount * opts.weaponDamage;
+			iLen = opts.activeTiles.length;
+
+			for (i = 0; i < iLen; i++) {
+				type = opts.activeTiles[i].type;
+
+				if (type === 'enemy') {
+					row = opts.activeTiles[i].row;
+					col = opts.activeTiles[i].col;
+					virtualTile = this.virtualGameField[row][col];
+
+					tile = document.getElementById('' + row + col);
+					if (opts.damage > virtualTile.health) {
+						tile.classList.add('killed');
+					} else {
+						tile.classList.remove('killed');
+					}
+				}
 			}
 		},
 
@@ -503,6 +541,7 @@
 			}
 
 			opts.weaponCount = 0;
+			this.calculateDamage();
 			opts.activeTiles = [];
 			activeDOMTiles = objs.gameField.querySelectorAll('.active');
 			iLen = activeDOMTiles.length;
@@ -635,7 +674,7 @@
 
 			setTimeout(function () {
 
-				defenceDamage =  Math.floor(totalAttack / 3);
+				defenceDamage = Math.floor(totalAttack / 3);
 
 				if (totalAttack > opts.defence) {
 					totalAttack -= opts.defence;
