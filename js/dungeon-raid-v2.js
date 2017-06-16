@@ -14,6 +14,8 @@
 			moneyBlock: document.getElementById('money'),
 			healthBlock: document.getElementById('health'),
 			defenceBlock: document.getElementById('defence'),
+			collectedBlock: document.getElementById('totalCollected'),
+            collectedValue: document.getElementById('totalCollectedValue'),
 
 			healSound: null,
 			hitSound: null,
@@ -76,6 +78,10 @@
 			objs.gameField.addEventListener('mouseover', self.mouseOverHandler.bind(self));
 			objs.gameField.addEventListener('touchmove', self.mouseOverHandler.bind(self));
 
+            // Mouse move
+			objs.gameField.addEventListener('mousemove', self.mouseMoveHandler.bind(self));
+            objs.gameField.addEventListener('touchmove', self.mouseMoveHandler.bind(self));
+
 			//Mouse up
 			document.addEventListener('touchend', self.mouseUpHandler.bind(self));
 			document.addEventListener('mouseup', self.mouseUpHandler.bind(self));
@@ -101,6 +107,7 @@
 		mouseDownHandler: function (e) {
 			var opts = this.options,
 				target = e.target,
+                objs = this.objects,
 				targetRow,
 				targetCol,
 				virtualTile;
@@ -122,6 +129,7 @@
 				opts.activeType = virtualTile.type;
 				this.addActiveTile(targetRow, targetCol);
 				target.classList.add('active');
+                objs.collectedBlock.classList.add('visible');
 			}
 		},
 
@@ -173,7 +181,8 @@
 		 * Mouse up event handler
 		 */
 		mouseUpHandler: function () {
-			var opts = this.options;
+			var opts = this.options,
+                objs = this.objects;
 
 			if (opts.dragActive) {
 				opts.dragActive = false;
@@ -181,8 +190,30 @@
 					this.deleteActiveTiles();
 				}
 				this.resetActiveTiles();
+
+                objs.collectedBlock.classList.remove('visible');
 			}
 		},
+
+        /**
+         * Mouse move event handler
+         */
+        mouseMoveHandler:  function (e) {
+            var opts = this.options,
+                objs = this.objects;
+
+            if (opts.dragActive) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // console.log(e.changedTouches[0]);
+                if(e.changedTouches && e.changedTouches[0]){
+                    objs.collectedBlock.style.transform = 'translate('+ (15 + e.changedTouches[0].pageX) + 'px, ' + (15 + e.changedTouches[0].pageY) + 'px)';
+                } else {
+                    objs.collectedBlock.style.transform = 'translate('+ (15 + e.pageX) + 'px, ' + (15 + e.pageY) + 'px)';
+                }
+            }
+        },
 
 		// /**
 		//  * Mouse leave event handler
@@ -272,14 +303,38 @@
 				this.calculateDamage();
 			}
 			if (tileType === 'weapon') {
-				opts.weaponCount++;
-				this.calculateDamage();
-			}
-			opts.columnsChanged[col] = true;
+                opts.weaponCount++;
+                this.calculateDamage();
+            }
+
+            this.collectValues();
+
+            opts.columnsChanged[col] = true;
 			opts.dragActive = true;
 
-			console.log(opts.weaponCount * opts.weaponDamage + opts.baseDamage);
+			// console.log(opts.weaponCount * opts.weaponDamage + opts.baseDamage);
 		},
+
+        collectValues: function () {
+            var objs = this.objects,
+                opts = this.options;
+
+            if (opts.activeType === 'enemy') {
+                objs.collectedValue.innerHTML = opts.damage;
+            }
+            if (opts.activeType === 'weapon') {
+                objs.collectedValue.innerHTML = opts.damage;
+            }
+            if(opts.activeType === 'health') {
+                objs.collectedValue.innerHTML = opts.activeTiles.length * 5;
+            }
+            if(opts.activeType === 'armor') {
+                objs.collectedValue.innerHTML = opts.activeTiles.length;
+            }
+            if(opts.activeType === 'money') {
+                objs.collectedValue.innerHTML = opts.activeTiles.length;
+            }
+        },
 
 		/**
 		 * Add an arrow to show the way of tile selecting
@@ -354,6 +409,7 @@
 				opts.activeTiles.pop();
 				this.calculateDamage();
 			}
+            this.collectValues();
 		},
 
 		/**

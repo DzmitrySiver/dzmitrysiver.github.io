@@ -71,6 +71,27 @@ body {
 .healthBlock {
 }
 
+.collectedValDynamicDisplay {
+    position: fixed;
+    display: none;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: 20px;
+    min-width: 50px;
+    transform: translate(0,0);
+
+    font-size: 20px;
+    line-height: 20px;
+    color: #ccc;
+    background-color: #585a5b;
+    border-radius: 3px;
+}
+
+.collectedValDynamicDisplay.visible {
+    display: block;
+}
+
 .red {
     /*position: relative;*/
     top: 100px;
