@@ -553,7 +553,7 @@
 			iLen = activeDOMTiles.length;
 
 			for (i = 0; i < iLen; i++) {
-				activeDOMTiles[i].classList.remove('active', 'lineTop', 'lineTopRight', 'lineRight', 'lineBottomRight', 'lineBottom', 'lineBottomLeft', 'lineLeft', 'lineTopLeft');
+				activeDOMTiles[i].classList.remove('killed', 'active', 'lineTop', 'lineTopRight', 'lineRight', 'lineBottomRight', 'lineBottom', 'lineBottomLeft', 'lineLeft', 'lineTopLeft');
 			}
 
 			delete opts.lastActiveTile.row;
