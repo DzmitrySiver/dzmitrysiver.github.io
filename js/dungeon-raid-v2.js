@@ -498,7 +498,7 @@
                     virtualTile = this.virtualGameField[row][col];
 
                     tile = document.getElementById('' + row + col);
-                    if (opts.damage > virtualTile.health) {
+                    if (opts.damage >= virtualTile.health) {
                         tile.classList.add('killed');
                     } else {
                         tile.classList.remove('killed');
