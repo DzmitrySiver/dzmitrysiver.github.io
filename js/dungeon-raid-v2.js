@@ -327,7 +327,7 @@
                 objs.collectedValue.innerHTML = opts.damage;
             }
             if (opts.activeType === 'health') {
-                objs.collectedValue.innerHTML = opts.activeTiles.length * 5;
+                objs.collectedValue.innerHTML = opts.activeTiles.length * opts.bottleHealthRestore;
             }
             if (opts.activeType === 'armor') {
                 objs.collectedValue.innerHTML = opts.activeTiles.length;
