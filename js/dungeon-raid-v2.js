@@ -32,6 +32,7 @@
             tileMargin: 20,
             isMobile: false,
             dragActive: false,
+            cursorOffset: 15,
             activeType: '',
             activeTiles: [],
             lastActiveTile: {
@@ -53,6 +54,7 @@
             weaponCount: 0,
             health: 100,
             maxHealth: 100,
+            bottleHealthRestore: 5,
             baseDamage: 3,
             weaponDamage: 3,
             defence: 3,
@@ -206,11 +208,10 @@
                 e.preventDefault();
                 e.stopPropagation();
 
-                // console.log(e.changedTouches[0]);
                 if (e.changedTouches && e.changedTouches[0]) {
-                    objs.collectedBlock.style.transform = 'translate(' + (15 + e.changedTouches[0].pageX) + 'px, ' + (15 + e.changedTouches[0].pageY) + 'px)';
+                    objs.collectedBlock.style.transform = 'translate(' + (opts.cursorOffset + e.changedTouches[0].pageX) + 'px, ' + (opts.cursorOffset + e.changedTouches[0].pageY) + 'px)';
                 } else {
-                    objs.collectedBlock.style.transform = 'translate(' + (15 + e.pageX) + 'px, ' + (15 + e.pageY) + 'px)';
+                    objs.collectedBlock.style.transform = 'translate(' + (opts.cursorOffset + e.pageX) + 'px, ' + (opts.cursorOffset + e.pageY) + 'px)';
                 }
             }
         },
@@ -661,7 +662,7 @@
                 objs = this.objects;
 
             objs.healSound.play();
-            opts.health += addedHealth * 5;
+            opts.health += addedHealth * opts.bottleHealthRestore;
             if (opts.health > opts.maxHealth) {
                 opts.health = opts.maxHealth;
             }
